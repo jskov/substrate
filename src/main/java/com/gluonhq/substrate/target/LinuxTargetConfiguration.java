@@ -31,6 +31,7 @@ import com.gluonhq.substrate.Constants;
 import com.gluonhq.substrate.model.ClassPath;
 import com.gluonhq.substrate.model.InternalProjectConfiguration;
 import com.gluonhq.substrate.model.ProcessPaths;
+import com.gluonhq.substrate.target.LinuxFlavor.LINUX_FLAVOR;
 import com.gluonhq.substrate.util.FileOps;
 import com.gluonhq.substrate.util.Logger;
 import com.gluonhq.substrate.util.Version;
@@ -52,6 +53,7 @@ public class LinuxTargetConfiguration extends PosixTargetConfiguration {
 
     private static final Version COMPILER_MINIMAL_VERSION = new Version(6);
     private static final Version LINKER_MINIMAL_VERSION = new Version(2, 26);
+    private static final LINUX_FLAVOR linuxFlavor = new LinuxFlavor().getFlavor();
 
     private static final List<String> linuxLibs = Arrays.asList("z", "dl", "stdc++", "pthread");
 
@@ -119,8 +121,11 @@ public class LinuxTargetConfiguration extends PosixTargetConfiguration {
         List<String> answer = new LinkedList<>();
         answer.add("-rdynamic");
         if (!useJavaFX) return answer;
+        
+        String gtkConfigName = linuxFlavor.isDebNaming() ? "gtk+-3.0" : "gtk+";
+        String gthreadConfigName = linuxFlavor.isDebNaming() ? "gthread-2.0" : "gthread";
 
-        ProcessBuilder process = new ProcessBuilder("pkg-config", "--libs", "gtk+-3.0", "gthread-2.0", "xtst");
+        ProcessBuilder process = new ProcessBuilder("pkg-config", "--libs", gtkConfigName, gthreadConfigName, "xtst");
         process.redirectErrorStream(true);
         try {
             Process start = process.start();
@@ -271,6 +276,4 @@ public class LinuxTargetConfiguration extends PosixTargetConfiguration {
         }
         return "aarch64-linux-gnu-gcc";
     }
-
-
 }

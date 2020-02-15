@@ -40,10 +40,6 @@ import java.util.regex.Pattern;
 public class LinuxFlavor {
     private static final Pattern OS_RELEASE_PROPERTY_PATTERN = Pattern.compile("([A-Z_-]+)=\"?(.+)\"?");
 
-    public static void main(String[] args) {
-		System.out.println("Is on " + new LinuxFlavor().getFlavor());
-	}
-    
     public enum PACKAGING_SYSTEM {
     	DEB,
     	RPM
@@ -59,11 +55,11 @@ public class LinuxFlavor {
 			this.packagingSystem = packagingSystem;
     	}
 
-		public boolean isUsingDeb() {
+		public boolean isDebNaming() {
 			return packagingSystem == PACKAGING_SYSTEM.DEB;
 		}
 
-		public boolean isUsingRpm() {
+		public boolean isRpmNaming() {
 			return packagingSystem == PACKAGING_SYSTEM.RPM;
 		}
     }

@@ -61,7 +61,13 @@ public class LinuxTargetConfiguration extends PosixTargetConfiguration {
             "java", "nio", "zip", "net", "prefs", "jvm", "strictmath", "j2pkcs11", "sunec", "extnet", "libchelper"
     );
 
-    private static final List<String> linuxfxlibs = Arrays.asList( "-Wl,--whole-archive",
+    private static final List<String> linuxfxlibs = List.of(
+    		"-Wl,--whole-archive",
+            "-lprism_es2", "-lglass", "-lglassgtk3", "-ljavafx_font",
+            "-ljavafx_font_freetype", "-ljavafx_font_pango", "-ljavafx_iio",
+            "-ljfxmedia", "-lfxplugins", "-lavplugin");
+            
+    private static final List<String> XXXxlinuxfxlibs = Arrays.asList( "-Wl,--whole-archive",
             "-lprism_es2", "-lglass", "-lglassgtk3", "-ljavafx_font",
             "-ljavafx_font_freetype", "-ljavafx_font_pango", "-ljavafx_iio",
             "-ljfxmedia", "-lfxplugins", "-lavplugin",
@@ -122,28 +128,14 @@ public class LinuxTargetConfiguration extends PosixTargetConfiguration {
         answer.add("-rdynamic");
         if (!useJavaFX) return answer;
         
-        String gtkConfigName = linuxFlavor.isDebNaming() ? "gtk+-3.0" : "gtk+";
-        String gthreadConfigName = linuxFlavor.isDebNaming() ? "gthread-2.0" : "gthread";
-
-        ProcessBuilder process = new ProcessBuilder("pkg-config", "--libs", gtkConfigName, gthreadConfigName, "xtst");
-        process.redirectErrorStream(true);
-        try {
-            Process start = process.start();
-            InputStream is = start.getInputStream();
-            start.waitFor();
-            BufferedReader br = new BufferedReader(new InputStreamReader(is));
-            String line;
-            while ((line = br.readLine()) != null) {
-                Logger.logInfo("[SUB] " + line);
-            }
-        } catch (IOException | InterruptedException e) {
-            e.printStackTrace();
-        }
-
         answer.addAll(linuxfxlibs);
         if (usePrismSW) {
             answer.addAll(linuxfxSWlibs);
         }
+
+        answer.addAll(new LinuxLinkerFlags().getLinkerFlags());
+        
+        Logger.logInfo("[Link flags] " + answer);
         return answer;
     }
 

@@ -71,7 +71,11 @@ public class LinuxLinkerFlags {
 			activeOf(debian("libavformat", "libavformat-dev"), 	fedora("libavformat", "ffmpeg-devel")),
 			activeOf(debian("libavutil", "libavutil-dev"),	 	fedora("libavutil", "ffmpeg-devel")),
 
-			activeOf(debian("alsa", "libasound2-dev"),	 		fedora("alsa", "alsa-lib-devel"))
+			activeOf(debian("alsa", "libasound2-dev"),	 		fedora("alsa", "alsa-lib-devel")),
+
+			hardwired("-lm"),
+			
+			activeOf(debian("gmodule-no-export-2.0", "libglib2.0-dev"),	fedora("gmodule-no-export-2.0", "glib2-devel"))
 		);
 	
 	
@@ -79,12 +83,6 @@ public class LinuxLinkerFlags {
 		List<String> pkgFlags = LINK_DEPENDENCIES.stream()
 			.flatMap(pkg -> lookupPackageFlags(pkg).stream())
 			.collect(Collectors.toList());
-		
-		
-		pkgFlags.addAll(List.of(
-	            "-lm", "-lgmodule-2.0"
-
-				));
 		
 		Logger.logInfo("All flags: " + pkgFlags);
 		

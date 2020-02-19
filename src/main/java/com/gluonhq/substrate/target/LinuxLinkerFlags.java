@@ -87,6 +87,9 @@ public class LinuxLinkerFlags {
 			activeOf(debian("gtk+-x11-3.0", "libgtk-3-dev"),	fedora("gtk+-3.0", "gtk3-devel")),
 			activeOf(debian("freetype2", "libfreetype6-dev"),	fedora("freetype2", "freetype-devel")),
 			activeOf(debian("pangoft2", "libpango1.0-dev"),		fedora("pangoft2", "pango-devel")),
+			
+			hardwired("-lgstreamer-lite"),
+			
 			activeOf(debian("gthread-2.0", "libglib2.0-dev"),	fedora("gthread-2.0", "glib2-devel")),
 			
 			hardwired("-lstdc++"),

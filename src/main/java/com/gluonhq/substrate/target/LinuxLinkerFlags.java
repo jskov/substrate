@@ -1,6 +1,7 @@
 package com.gluonhq.substrate.target;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -53,7 +54,6 @@ public class LinuxLinkerFlags {
 			activeOf(debian("gl", "libgl-dev"), 				fedora("gl", "mesa-libGL-devel")),
 			activeOf(debian("x11", "libx11-dev"), 				fedora("x11", "libX11-devel")),
 			activeOf(debian("gtk+-x11-3.0", "libgtk-3-dev"),	fedora("gtk+-3.0", "gtk3-devel")),
-			activeOf(debian("gtk+-x11-3.0", "libgtk-3-dev"),	fedora("gtk+-3.0", "gtk3-devel")),
 			activeOf(debian("freetype2", "libfreetype6-dev"),	fedora("freetype2", "freetype-devel")),
 			activeOf(debian("pangoft2", "libpango1.0-dev"),		fedora("pangoft2", "pango-devel")),
 			
@@ -80,16 +80,21 @@ public class LinuxLinkerFlags {
 	
 	
 	public List<String> getLinkerFlags() {
+		List<String> missingPackages = new ArrayList<>();
+		
 		List<String> pkgFlags = LINK_DEPENDENCIES.stream()
-			.flatMap(pkg -> lookupPackageFlags(pkg).stream())
+			.flatMap(pkg -> lookupPackageFlags(pkg, missingPackages).stream())
 			.collect(Collectors.toList());
 		
-		Logger.logInfo("All flags: " + pkgFlags);
+		if (!missingPackages.isEmpty()) {
+			printUpdateInstructionsAndFail(missingPackages);
+		}
 		
+		Logger.logDebug("All flags: " + pkgFlags);
 		return pkgFlags;
 	}
 
-	private List<String> lookupPackageFlags(PkgInfo pkgInfo) {
+	private List<String> lookupPackageFlags(PkgInfo pkgInfo, List<String> missingPackages) {
 		if (pkgInfo.hardwired != null) {
 			return List.of(pkgInfo.hardwired);
 		}
@@ -98,17 +103,32 @@ public class LinuxLinkerFlags {
 		ProcessRunner process = new ProcessRunner("/usr/bin/pkg-config", "--libs", pkgName);
         try {
 			if (process.runProcess("Get config for " + pkgName) != 0) {
-				throw new IllegalStateException("Package " + pkgName + " not present for linking, please install " + pkgInfo.installName);
+				missingPackages.add(pkgInfo.installName + " (for pkgConfig " + pkgName + ")");
+				return List.of();
 			}
 		} catch (IOException | InterruptedException e) {
 			throw new IllegalStateException("Failed to lookup linker flags", e);
 		}
         
         List<String> flags = List.of(process.getResponse().trim().split(" "));
-        Logger.logInfo("Pkg " + pkgName + " provided flags: " + flags);
+        Logger.logDebug("Pkg " + pkgName + " provided flags: " + flags);
 		return flags;
 	}
 	
+	private void printUpdateInstructionsAndFail(List<String> missingPackages) {
+		String nl = System.lineSeparator();
+		String nlIndent = nl + "  ";
+		String instructions = missingPackages.stream()
+				.sorted()
+				.distinct()
+				.collect(Collectors.joining(nlIndent));
+		Logger.logInfo("Cannot link because some development libraries are missing."
+						+ nl
+						+ "Please install OS packages:"
+						+ nlIndent + instructions);
+		throw new IllegalStateException("Missing linker libraries");
+	}
+
 	public static void main(String[] args) {
 		System.out.println("output: " + new LinuxLinkerFlags().getLinkerFlags());
 	}

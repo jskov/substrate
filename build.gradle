@@ -5,6 +5,7 @@ plugins {
     id 'signing'
     id 'io.codearte.nexus-staging' version '0.21.1'
     id 'de.marcphilipp.nexus-publish' version '0.4.0'
+    id 'eclipse'
 }
 
 group = "com.gluonhq"
@@ -113,4 +114,19 @@ nexusPublishing {
 nexusStaging {
     username = project.hasProperty('sonatypeUsername') ? project.property('sonatypeUsername') : ''
     password = project.hasProperty('sonatypePassword') ? project.property('sonatypePassword') : ''
+}
+
+eclipse {
+    classpath {
+        file {
+            withXml {
+                it.asNode().classpathentry.findAll { cpe -> cpe.@path.contains("dd") || cpe.@path.contains("bcp") }.each { cpe -> markCpeAsModular(cpe) }
+            }
+        }
+    }
+}
+
+void markCpeAsModular(Node cpe) {
+	def n = cpe.appendNode("attribute", ["name": "module", "value": "true"])
+	cpe.attributes.each { attrs -> attrs.append(n) }
 }

@@ -31,7 +31,6 @@ import com.gluonhq.substrate.Constants;
 import com.gluonhq.substrate.model.ClassPath;
 import com.gluonhq.substrate.model.InternalProjectConfiguration;
 import com.gluonhq.substrate.model.ProcessPaths;
-import com.gluonhq.substrate.target.LinuxFlavor.LINUX_FLAVOR;
 import com.gluonhq.substrate.util.FileOps;
 import com.gluonhq.substrate.util.Logger;
 import com.gluonhq.substrate.util.Version;
@@ -53,7 +52,6 @@ public class LinuxTargetConfiguration extends PosixTargetConfiguration {
 
     private static final Version COMPILER_MINIMAL_VERSION = new Version(6);
     private static final Version LINKER_MINIMAL_VERSION = new Version(2, 26);
-    private static final LINUX_FLAVOR linuxFlavor = new LinuxFlavor().getFlavor();
 
     private static final List<String> linuxLibs = Arrays.asList("z", "dl", "stdc++", "pthread");
 
@@ -67,20 +65,6 @@ public class LinuxTargetConfiguration extends PosixTargetConfiguration {
             "-ljavafx_font_freetype", "-ljavafx_font_pango", "-ljavafx_iio",
             "-ljfxmedia", "-lfxplugins", "-lavplugin");
             
-    private static final List<String> XXXxlinuxfxlibs = Arrays.asList( "-Wl,--whole-archive",
-            "-lprism_es2", "-lglass", "-lglassgtk3", "-ljavafx_font",
-            "-ljavafx_font_freetype", "-ljavafx_font_pango", "-ljavafx_iio",
-            "-ljfxmedia", "-lfxplugins", "-lavplugin",
-            "-Wl,--no-whole-archive", "-lGL", "-lX11","-lgtk-3", "-lgdk-3",
-            "-lpangocairo-1.0", "-lpango-1.0", "-latk-1.0",
-            "-lcairo-gobject", "-lcairo", "-lgdk_pixbuf-2.0",
-            "-lgio-2.0", "-lgobject-2.0", "-lglib-2.0", "-lfreetype",
-            "-lpangoft2-1.0", "-lgstreamer-lite",
-            "-lgthread-2.0", "-lstdc++", "-lz", "-lXtst",
-            "-lavcodec", "-lavformat", "-lavutil",
-            "-lasound", "-lm", "-lgmodule-2.0"
-    );
-
     private String[] capFiles = {"AArch64LibCHelperDirectives.cap",
             "AMD64LibCHelperDirectives.cap", "BuiltinDirectives.cap",
             "JNIHeaderDirectives.cap", "LibFFIHeaderDirectives.cap",

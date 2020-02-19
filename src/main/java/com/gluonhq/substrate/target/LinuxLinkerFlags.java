@@ -46,40 +46,9 @@ public class LinuxLinkerFlags {
 			return new PkgInfo("", "", flag);
 		}
 	}
-	/*
-	 * 
-	 * 
-            "-Wl,--no-whole-archive", 
-            "-lGL", // gl
-             "-lX11", // x11
-             "-lgtk-3", "-lgdk-3","-lpangocairo-1.0", "-lpango-1.0", "-latk-1.0", "-lcairo-gobject", "-lcairo", "-lgdk_pixbuf-2.0", "-lgio-2.0", "-lgobject-2.0", "-lglib-2.0",
-             // gtk+-x11-3.0
-              
-              // fedora pkg-config --libs gtk+
-              // : -lgtk -lgdk -lXi -lXext -lX11 -lm -lglib
-              
-              
-              "-lfreetype",
-              
-            "-lpangoft2-1.0", // pangoft2
-            
-             "-lgstreamer-lite", /??
-             
-            "-lgthread-2.0", 
-            
-            "-lstdc++", "-lz", "-lXtst",
-            "-lavcodec", "-lavformat", "-lavutil",
-            "-lasound", "-lm", "-lgmodule-2.0"
 
-
-
-	 * 
-	 * 
-	 * 
-	 */
-	
 	private static final List<PkgInfo> LINK_DEPENDENCIES = List.of(
-	        hardwired("-Wl,--no-whole-archive"),
+			hardwired("-Wl,--no-whole-archive"),
 
 			activeOf(debian("gl", "libgl-dev"), 				fedora("gl", "mesa-libGL-devel")),
 			activeOf(debian("x11", "libx11-dev"), 				fedora("x11", "libX11-devel")),
@@ -97,14 +66,13 @@ public class LinuxLinkerFlags {
 			
 			activeOf(debian("xtst", "libxtst-dev"), 			fedora("xtst", "libXtst-devel")),
 
-//			activeOf(debian("libavcodec", "libavcodec-dev"), 	fedora("libavcodec", "avcodec")),
-//			activeOf(debian("libavformat", "libavformat-dev"), 	fedora("libavformat", "avformat")),
-//			activeOf(debian("libavutil", "libavutil-dev"),	 	fedora("libavutil", "avutil")),
+			// On fedora these require https://rpmfusion.org/
+			activeOf(debian("libavcodec", "libavcodec-dev"), 	fedora("libavcodec", "ffmpeg-devel")),
+			activeOf(debian("libavformat", "libavformat-dev"), 	fedora("libavformat", "ffmpeg-devel")),
+			activeOf(debian("libavutil", "libavutil-dev"),	 	fedora("libavutil", "ffmpeg-devel")),
 
 			activeOf(debian("alsa", "libasound2-dev"),	 		fedora("alsa", "alsa-lib-devel"))
-
-			);
-			
+		);
 	
 	
 	public List<String> getLinkerFlags() {
